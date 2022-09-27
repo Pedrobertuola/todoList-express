@@ -10,10 +10,12 @@
   
 
             <% newListItems.forEach(function(singleItem){ %>
-               <div class="item">
-                <input type="checkbox">
-                <p> <%= singleItem.name %></p>
-            </div>
+             <form action="/delete" method="post"> 
+                <div class="item">
+                    <input type="checkbox" name="checkbox" value="<%=singleItem._id%>" onChange="this.form.submit()">
+                    <p> <%= singleItem.name %></p>
+                </div>
+            </form> 
             <% }) %>
 
         <form class="item" action="/" method="post">

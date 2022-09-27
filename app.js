@@ -78,6 +78,27 @@ app.post("/", function (req, res) {
   
 });
 
+app.post("/delete", function(req, res) {
+  const checkedItemId =  req.body.checkbox
+  Item.deleteOne({_id: checkedItemId}, function(err){
+    if (err){
+      console.log(err)
+    } else {
+      console.log("item deleted")
+    }
+  })
+  res.redirect("/");
+})
+//Instead of deleteOne
+/* item.dinfByIdAndRemove(checkedItemId, function(err){
+  if(!err){
+    console.log("Deleted")
+  } else {
+    console.log(err)
+  }
+}) */
+
+
 app.get("/work", function(req,res){
   res.render("list", {listTitle: "Work List", newListItems: workItems});
 })
