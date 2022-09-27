@@ -1,11 +1,42 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const date = require(__dirname + "/date.js");
+const mongoose = require("mongoose");
 
 const app = express();
 
-let items = ["Buy Food", "Cook Food", "Eat Food"];
-let workItems = [];
+mongoose.connect("mongodb://localhost:27017/todolistDB", {useNewUrlParser: true});
+
+const itemsSchema = {
+  name: String
+};
+
+const Item = mongoose.model(
+  "Item",
+  itemsSchema
+);  
+
+const studyEnglish = new Item({
+  name: "Study English"
+})
+
+
+const studyJavascript = new Item({
+  name: "Study Javascript"
+})
+
+
+const practiceJiujitsu = new Item({
+  name: "Practice Jiu-jitsu"
+})
+
+
+
+const defaultItems = [studyEnglish, studyJavascript, practiceJiujitsu];
+
+
+
+
+
 
 app.set("view engine", "ejs");
 
@@ -13,25 +44,36 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"))
 
 app.get("/", function (req, res) {
-  let day = date();
 
-  res.render("list", { listTitle: day, newListItems: items });
+  Item.find({},function(err, results){
+
+    if (results.length === 0) {
+       Item.insertMany(defaultItems, function(err){
+  if(err){
+    console.log(err)
+  } else {
+    console.log("Successfully saved default items to DB.")
+  } 
 });
+  res.redirect("/");
+    } else {
+      res.render("list", {listTitle: "Today", newListItems: results });
+    }      
+    })  
+  })
+;
 
 app.post("/", function (req, res) {
 
-  let item = req.body.newItem;
+  const itemName = req.body.newItem;  
 
-  if (req.body.list === "Work") {
-    workItems.push(item);
-    res.redirect("/work")
-  } else {
-    items.push(item);
-    res.redirect("/");
-  }
+  const item = new Item({
+    name: itemName
+  })
 
+  item.save();
 
-  
+  res.redirect("/");
   
   
 });
